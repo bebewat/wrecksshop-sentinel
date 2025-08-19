@@ -8,6 +8,9 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wrecks-json-bot-runner   # 👈 folder that has package.json
 
     steps:
       - name: Check out repo
@@ -16,14 +19,11 @@ jobs:
       - name: Set up Node.js (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'        # or '22' if you prefer
-          cache: 'npm'              # enables npm cache
-          cache-dependency-path: |
-            package-lock.json
-            **/package-lock.json
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: wrecks-json-bot-runner-with-botjson/package-lock.json
 
-      # Use npm ci if lockfile exists; otherwise npm install
-      - name: Install deps
+      - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
             npm ci
@@ -31,9 +31,8 @@ jobs:
             npm install
           fi
 
-      # Optional: build or start
       - name: Build (optional)
         run: npm run build --if-present
 
-      - name: Run tests (optional)
+      - name: Test (optional)
         run: npm test --if-present
