@@ -1,4 +1,4 @@
-name: CI - Node Runner
+name: CI - Auto Node Folder
 
 on:
   push:
@@ -8,9 +8,6 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: wrecks-json-bot-runner   # 👈 folder that has package.json
 
     steps:
       - name: Check out repo
@@ -21,9 +18,40 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: wrecks-json-bot-runner-with-botjson/package-lock.json
+
+      # Helpful debug: show where we are and what's in the repo
+      - name: Show repo tree (top 3 levels)
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          find . -maxdepth 3 -type f -name "package.json" -print
+
+      # Auto-detect the folder that contains package.json
+      - name: Detect project directory
+        id: detect
+        shell: bash
+        run: |
+          set -e
+          # pick the first package.json found in the repo
+          PKG_DIR="$(find . -type f -name package.json -not -path './node_modules/*' | head -n1 | sed 's|/package.json$||')"
+          if [ -z "$PKG_DIR" ]; then
+            echo "❌ No package.json found in repository."
+            exit 1
+          fi
+          echo "Found package.json in: $PKG_DIR"
+          echo "pkgdir=$PKG_DIR" >> "$GITHUB_OUTPUT"
+
+      # Optional: enable more accurate npm caching by pointing to the lockfile (if present)
+      - name: Prime npm cache (optional)
+        if: ${{ hashFiles( format('{0}/package-lock.json', steps.detect.outputs.pkgdir) ) != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ${{ steps.detect.outputs.pkgdir }}/package-lock.json
 
       - name: Install dependencies
+        working-directory: ${{ steps.detect.outputs.pkgdir }}
         run: |
           if [ -f package-lock.json ]; then
             npm ci
@@ -32,7 +60,9 @@ jobs:
           fi
 
       - name: Build (optional)
+        working-directory: ${{ steps.detect.outputs.pkgdir }}
         run: npm run build --if-present
 
       - name: Test (optional)
+        working-directory: ${{ steps.detect.outputs.pkgdir }}
         run: npm test --if-present
