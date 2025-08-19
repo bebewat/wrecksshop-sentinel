@@ -1,1 +1,790 @@
-{}
+{
+  "name": "Wrecks Shop Bot",
+  "version": "1.0-json",
+  "language": "Javascript",
+  "context": "Manual Server Script",
+  "description": "JSON-defined Discord shop bot for Ark: Survival Ascended. Converted from Python project.",
+  "author": "Bebe (Tyrannosaurus Wrecks)",
+  
+    "discord": {
+      "bot_token": "",
+      "shop_channel_id": "",
+      "log_channel_id": "",
+      "presence": {
+        "status": "online",
+        "activity": "Managing the Wrecks Shop"
+      }
+    },
+    "security": {
+      "command_cooldown_seconds": 3,
+      "max_transfer_amount": 10000,
+      "require_steam_linking": true,
+      "admin_roles": [
+        {
+          "name": "Owner",
+          "discord_role_id": "",
+          "permissions": [
+            "*"
+          ],
+          "point_multiplier": 5.0,
+          "enabled": true
+        },
+        {
+          "name": "Admin",
+          "discord_role_id": "",
+          "permissions": [
+            "shop.manage",
+            "users.manage",
+            "points.give"
+          ],
+          "point_multiplier": 3.0,
+          "enabled": true
+        },
+        {
+        "name": "Moderator",
+        "discord_role_id": "",
+        "permissions": [
+          "shop.view",
+          "users.view"
+        ],
+        "point_multiplier": 2.0,
+        "enabled": true
+      }
+    ]
+  },
+    "economy": {
+      "currency_name": "points",
+      "reward_interval_minutes": 60,
+      "reward_amount": 10,
+      "player_tiers": {
+        "default": {
+          "multiplier": 1.0,
+          "requirements": "None"
+        },
+        "donor": {
+          "multiplier": 1.5,
+          "requirements": "Donation"
+        },
+        "vip": {
+          "multiplier": 2.0,
+          "requirements": "VIP Status"
+        },
+        "admin": {
+          "multiplier": 3.0,
+          "requirements": "Admin Role"
+        }
+      }
+    },
+    "integrations": {
+      "rcon_servers": [],
+      "databases": [
+        {
+          "name": "Default SQLite",
+          "type": "sqlite",
+          "path": "data/bot_database.db",
+          "host": "localhost",
+          "port": "",
+          "database": "bot_database.db"
+        }
+      ],
+      "tip4serv": {
+        "secret": "",
+        "token": ""
+      },
+      "logging": {
+        "level": "INFO",
+        "file": "logs/bot.log",
+        "max_file_size": 10485760,
+        "backup_count": 5
+      }
+    },
+    "shop": {
+      "default_category": "General",
+      "max_items_per_page": 10,
+      "catalog": [
+        {
+          "name": "Metal Hatchet",
+          "category": "Weapons",
+          "description": "A sturdy metal hatchet for gathering wood and thatch efficiently.",
+          "default_price": 150,
+          "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponMetalHatchet.PrimalItem_WeaponMetalHatchet'\" {quantity} 1 0",
+          "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponMetalHatchet.PrimalItem_WeaponMetalHatchet",
+          "item_id": "PrimalItem_WeaponMetalHatchet",
+          "quality": "Normal",
+          "stackable": false
+        },
+        {
+          "name": "Metal Pick",
+          "category": "Weapons",
+          "description": "A metal pickaxe for efficient stone and metal gathering.",
+          "default_price": 150,
+          "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponMetalPick.PrimalItem_WeaponMetalPick'\" {quantity} 1 0",
+          "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponMetalPick.PrimalItem_WeaponMetalPick",
+          "item_id": "PrimalItem_WeaponMetalPick",
+          "quality": "Normal",
+          "stackable": false
+        },
+        {
+          "name": "Metal Sword",
+          "category": "Weapons",
+          "description": "A sharp metal sword for close combat.",
+          "default_price": 200,
+          "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponSword.PrimalItem_WeaponSword'\" {quantity} 1 0",
+          "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponSword.PrimalItem_WeaponSword",
+          "item_id": "PrimalItem_WeaponSword",
+          "quality": "Normal",
+          "stackable": false
+        },
+        {
+          "name": "Pike",
+          "category": "Weapons",
+          "description": "A long-reach melee weapon, effective against larger creatures.",
+          "default_price": 180,
+          "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponPike.PrimalItem_WeaponPike'\" {quantity} 1 0",
+          "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponPike.PrimalItem_WeaponPike",
+          "item_id": "PrimalItem_WeaponPike",
+          "quality": "Normal",
+          "stackable": false
+        },
+        {
+          "name": "Crossbow",
+          "category": "Weapons",
+          "description": "A powerful ranged weapon that fires bolts.",
+          "default_price": 250,
+          "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponCrossbow.PrimalItem_WeaponCrossbow'\" {quantity} 1 0",
+          "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponCrossbow.PrimalItem_WeaponCrossbow",
+          "item_id": "PrimalItem_WeaponCrossbow",
+          "quality": "Normal",
+          "stackable": false
+        },
+        {
+          "name": "Longneck Rifle",
+          "category": "Weapons",
+          "description": "A long-range rifle with high damage and accuracy.",
+          "default_price": 500,
+          "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponOneShotRifle.PrimalItem_WeaponOneShotRifle'\" {quantity} 1 0",
+          "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponOneShotRifle.PrimalItem_WeaponOneShotRifle",
+          "item_id": "PrimalItem_WeaponOneShotRifle",
+          "quality": "Normal",
+          "stackable": false
+        },
+        {
+        "name": "Fabricated Pistol",
+        "category": "Weapons",
+        "description": "A semi-automatic pistol with moderate damage.",
+        "default_price": 300,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponGun.PrimalItem_WeaponGun'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponGun.PrimalItem_WeaponGun",
+        "item_id": "PrimalItem_WeaponGun",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Assault Rifle",
+        "category": "Weapons",
+        "description": "A fully automatic rifle with high rate of fire.",
+        "default_price": 800,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponMachineGun.PrimalItem_WeaponMachineGun'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItem_WeaponMachineGun.PrimalItem_WeaponMachineGun",
+        "item_id": "PrimalItem_WeaponMachineGun",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Metal Helmet",
+        "category": "Armor",
+        "description": "Heavy metal helmet providing excellent protection.",
+        "default_price": 200,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalHelmet.PrimalItemArmor_MetalHelmet'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalHelmet.PrimalItemArmor_MetalHelmet",
+        "item_id": "PrimalItemArmor_MetalHelmet",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Metal Chestpiece",
+        "category": "Armor",
+        "description": "Heavy metal chestpiece for maximum torso protection.",
+        "default_price": 300,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalShirt.PrimalItemArmor_MetalShirt'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalShirt.PrimalItemArmor_MetalShirt",
+        "item_id": "PrimalItemArmor_MetalShirt",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Metal Leggings",
+        "category": "Armor",
+        "description": "Heavy metal leggings for leg protection.",
+        "default_price": 250,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalPants.PrimalItemArmor_MetalPants'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalPants.PrimalItemArmor_MetalPants",
+        "item_id": "PrimalItemArmor_MetalPants",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Metal Gauntlets",
+        "category": "Armor",
+        "description": "Heavy metal gauntlets for hand protection.",
+        "default_price": 150,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalGloves.PrimalItemArmor_MetalGloves'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalGloves.PrimalItemArmor_MetalGloves",
+        "item_id": "PrimalItemArmor_MetalGloves",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Metal Boots",
+        "category": "Armor",
+        "description": "Heavy metal boots for foot protection.",
+        "default_price": 150,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalBoots.PrimalItemArmor_MetalBoots'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Metal/PrimalItemArmor_MetalBoots.PrimalItemArmor_MetalBoots",
+        "item_id": "PrimalItemArmor_MetalBoots",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Metal Ingot",
+        "category": "Resources",
+        "description": "Refined metal ingot used in advanced crafting.",
+        "default_price": 10,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_MetalIngot.PrimalItemResource_MetalIngot'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_MetalIngot.PrimalItemResource_MetalIngot",
+        "item_id": "PrimalItemResource_MetalIngot",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Polymer",
+        "category": "Resources",
+        "description": "Advanced synthetic material for high-tech crafting.",
+        "default_price": 25,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_Polymer.PrimalItemResource_Polymer'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_Polymer.PrimalItemResource_Polymer",
+        "item_id": "PrimalItemResource_Polymer",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Crystal",
+        "category": "Resources",
+        "description": "Rare crystal used in electronics and advanced items.",
+        "default_price": 15,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_Crystal.PrimalItemResource_Crystal'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_Crystal.PrimalItemResource_Crystal",
+        "item_id": "PrimalItemResource_Crystal",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Black Pearl",
+        "category": "Resources",
+        "description": "Extremely rare resource obtained from dangerous creatures.",
+        "default_price": 100,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_BlackPearl.PrimalItemResource_BlackPearl'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_BlackPearl.PrimalItemResource_BlackPearl",
+        "item_id": "PrimalItemResource_BlackPearl",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Element",
+        "category": "Resources",
+        "description": "The most valuable resource, used for tek-tier items.",
+        "default_price": 1000,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_Element.PrimalItemResource_Element'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Resources/PrimalItemResource_Element.PrimalItemResource_Element",
+        "item_id": "PrimalItemResource_Element",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Spyglass",
+        "category": "Tools",
+        "description": "Allows you to see distant objects and creature levels.",
+        "default_price": 120,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Tools/PrimalItem_WeaponSpyglass.PrimalItem_WeaponSpyglass'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Tools/PrimalItem_WeaponSpyglass.PrimalItem_WeaponSpyglass",
+        "item_id": "PrimalItem_WeaponSpyglass",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "GPS",
+        "category": "Tools",
+        "description": "Shows your exact coordinates and location.",
+        "default_price": 200,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Tools/PrimalItem_WeaponGPS.PrimalItem_WeaponGPS'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Tools/PrimalItem_WeaponGPS.PrimalItem_WeaponGPS",
+        "item_id": "PrimalItem_WeaponGPS",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Parachute",
+        "category": "Tools",
+        "description": "Single-use parachute for safe falls from great heights.",
+        "default_price": 50,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Tools/PrimalItem_WeaponParachute.PrimalItem_WeaponParachute'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Tools/PrimalItem_WeaponParachute.PrimalItem_WeaponParachute",
+        "item_id": "PrimalItem_WeaponParachute",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Medical Brew",
+        "category": "Consumables",
+        "description": "Restores a large amount of health over time.",
+        "default_price": 30,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Consumables/PrimalItemConsumable_HealSoup.PrimalItemConsumable_HealSoup'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Consumables/PrimalItemConsumable_HealSoup.PrimalItemConsumable_HealSoup",
+        "item_id": "PrimalItemConsumable_HealSoup",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Energy Brew",
+        "category": "Consumables",
+        "description": "Restores stamina and provides temporary stamina regeneration boost.",
+        "default_price": 25,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Consumables/PrimalItemConsumable_StaminaSoup.PrimalItemConsumable_StaminaSoup'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Consumables/PrimalItemConsumable_StaminaSoup.PrimalItemConsumable_StaminaSoup",
+        "item_id": "PrimalItemConsumable_StaminaSoup",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Lazarus Chowder",
+        "category": "Consumables",
+        "description": "Provides oxygen underwater and improves swimming speed.",
+        "default_price": 40,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Consumables/PrimalItemConsumable_SwimSoup.PrimalItemConsumable_SwimSoup'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Consumables/PrimalItemConsumable_SwimSoup.PrimalItemConsumable_SwimSoup",
+        "item_id": "PrimalItemConsumable_SwimSoup",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Metal Foundation",
+        "category": "Structures",
+        "description": "Strong metal foundation for advanced building.",
+        "default_price": 80,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Structures/Metal/PrimalItemStructure_MetalFloor.PrimalItemStructure_MetalFloor'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Structures/Metal/PrimalItemStructure_MetalFloor.PrimalItemStructure_MetalFloor",
+        "item_id": "PrimalItemStructure_MetalFloor",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Metal Wall",
+        "category": "Structures",
+        "description": "Durable metal wall for secure building.",
+        "default_price": 60,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Structures/Metal/PrimalItemStructure_MetalWall.PrimalItemStructure_MetalWall'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Structures/Metal/PrimalItemStructure_MetalWall.PrimalItemStructure_MetalWall",
+        "item_id": "PrimalItemStructure_MetalWall",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Metal Door",
+        "category": "Structures",
+        "description": "Secure metal door with lock capability.",
+        "default_price": 100,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Structures/Metal/PrimalItemStructure_MetalDoor.PrimalItemStructure_MetalDoor'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Structures/Metal/PrimalItemStructure_MetalDoor.PrimalItemStructure_MetalDoor",
+        "item_id": "PrimalItemStructure_MetalDoor",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Generator",
+        "category": "Structures",
+        "description": "Electrical generator that runs on gasoline.",
+        "default_price": 400,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Structures/Misc/PrimalItemStructure_PowerGenerator.PrimalItemStructure_PowerGenerator'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Structures/Misc/PrimalItemStructure_PowerGenerator.PrimalItemStructure_PowerGenerator",
+        "item_id": "PrimalItemStructure_PowerGenerator",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Fabricator",
+        "category": "Structures",
+        "description": "Advanced crafting station for electronics and weapons.",
+        "default_price": 600,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Structures/Misc/PrimalItemStructure_Fabricator.PrimalItemStructure_Fabricator'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Structures/Misc/PrimalItemStructure_Fabricator.PrimalItemStructure_Fabricator",
+        "item_id": "PrimalItemStructure_Fabricator",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Rex Saddle",
+        "category": "Saddles",
+        "description": "Saddle for the mighty Tyrannosaurus Rex.",
+        "default_price": 800,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RexSaddle.PrimalItemArmor_RexSaddle'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_RexSaddle.PrimalItemArmor_RexSaddle",
+        "item_id": "PrimalItemArmor_RexSaddle",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Argentavis Saddle",
+        "category": "Saddles",
+        "description": "Saddle for the giant Argentavis bird.",
+        "default_price": 600,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ArgentavisSaddle.PrimalItemArmor_ArgentavisSaddle'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_ArgentavisSaddle.PrimalItemArmor_ArgentavisSaddle",
+        "item_id": "PrimalItemArmor_ArgentavisSaddle",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Pteranodon Saddle",
+        "category": "Saddles",
+        "description": "Saddle for the fast-flying Pteranodon.",
+        "default_price": 300,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_PteroSaddle.PrimalItemArmor_PteroSaddle'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_PteroSaddle.PrimalItemArmor_PteroSaddle",
+        "item_id": "PrimalItemArmor_PteroSaddle",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Trike Saddle",
+        "category": "Saddles",
+        "description": "Saddle for the herbivorous Triceratops.",
+        "default_price": 200,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TrikeSaddle.PrimalItemArmor_TrikeSaddle'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Armor/Saddles/PrimalItemArmor_TrikeSaddle.PrimalItemArmor_TrikeSaddle",
+        "item_id": "PrimalItemArmor_TrikeSaddle",
+        "quality": "Normal",
+        "stackable": false
+      },
+      {
+        "name": "Advanced Rifle Bullet",
+        "category": "Weapons",
+        "description": "High-damage ammunition for longneck rifles.",
+        "default_price": 5,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItemAmmo_AdvancedRifleBullet.PrimalItemAmmo_AdvancedRifleBullet'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItemAmmo_AdvancedRifleBullet.PrimalItemAmmo_AdvancedRifleBullet",
+        "item_id": "PrimalItemAmmo_AdvancedRifleBullet",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Tranquilizer Arrow",
+        "category": "Weapons",
+        "description": "Arrow that inflicts torpor for taming creatures.",
+        "default_price": 8,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItemAmmo_ArrowTranq.PrimalItemAmmo_ArrowTranq'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItemAmmo_ArrowTranq.PrimalItemAmmo_ArrowTranq",
+        "item_id": "PrimalItemAmmo_ArrowTranq",
+        "quality": "Normal",
+        "stackable": true
+      },
+      {
+        "name": "Rocket Propelled Grenade",
+        "category": "Weapons",
+        "description": "Explosive ammunition for rocket launchers.",
+        "default_price": 100,
+        "command": "GiveItemToPlayer {steam_id} \"Blueprint'/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItemAmmo_Rocket.PrimalItemAmmo_Rocket'\" {quantity} 1 0",
+        "blueprint_path": "/Game/PrimalEarth/CoreBlueprints/Items/Weapons/PrimalItemAmmo_Rocket.PrimalItemAmmo_Rocket",
+        "item_id": "PrimalItemAmmo_Rocket",
+        "quality": "Normal",
+        "stackable": true
+      }
+    ]
+  },
+  "schedules": [
+    {
+      "id": "hourly_reward",
+      "type": "interval",
+      "minutes": 60,
+      "actions": [
+        {
+          "action": "economy.grant_active_chatters",
+          "amount": 10,
+          "reason": "Hourly activity reward"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "on": "message_create",
+      "when": {
+        "channel": "shop_channel",
+        "regex": "^/shop$"
+      },
+      "actions": [
+        {
+          "action": "shop.render_page",
+          "page": 1
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "balance",
+      "aliases": [
+        "bal",
+        "points"
+      ],
+      "description": "Show your shop points balance (or another member's).",
+      "options_schema": [
+        {
+          "name": "user",
+          "type": "user",
+          "required": false
+        }
+      ],
+      "cooldown_seconds": 3,
+      "actions": [
+        {
+          "action": "economy.get_balance",
+          "from": "args.user|author",
+          "assign": "balance"
+        },
+        {
+          "action": "discord.reply_embed",
+          "title": "Your Balance",
+          "description": "Balance: {{balance}} {{economy.currency_name}}"
+        }
+      ]
+    },
+    {
+      "name": "shop",
+      "description": "Browse the shop catalog.",
+      "options_schema": [
+        {
+          "name": "page",
+          "type": "integer",
+          "required": false,
+          "default": 1
+        }
+      ],
+      "actions": [
+        {
+          "action": "shop.render_page",
+          "page_from": "args.page|1"
+        }
+      ]
+    },
+    {
+      "name": "buy",
+      "description": "Buy a catalog item.",
+      "options_schema": [
+        {
+          "name": "item",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "qty",
+          "type": "integer",
+          "required": false,
+          "default": 1
+        },
+        {
+          "name": "map",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "cooldown_seconds": 3,
+      "actions": [
+        {
+          "action": "shop.verify_item_exists",
+          "item_from": "args.item"
+        },
+        {
+          "action": "economy.charge",
+          "amount_from": "shop.item_price * args.qty",
+          "reason": "Shop purchase: {{args.item}}"
+        },
+        {
+          "action": "rcon.give_item",
+          "item_from": "args.item",
+          "quantity_from": "args.qty",
+          "map_from": "args.map",
+          "to_player": "author"
+        },
+        {
+          "action": "discord.reply_embed",
+          "title": "\u2705 Purchase Complete",
+          "description": "Bought {{args.qty}}x {{args.item}} for {{computed.total_price}} {{economy.currency_name}}."
+        }
+      ]
+    },
+    {
+      "name": "transfer",
+      "description": "Transfer points to another player.",
+      "options_schema": [
+        {
+          "name": "to",
+          "type": "user",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "cooldown_seconds": 5,
+      "actions": [
+        {
+          "action": "economy.transfer",
+          "from_player": "author",
+          "to_player_from": "args.to",
+          "amount_from": "args.amount"
+        },
+        {
+          "action": "discord.reply_embed",
+          "title": "\ud83d\udcb8 Transfer Complete",
+          "description": "Sent {{args.amount}} {{economy.currency_name}} to {{args.to}}."
+        }
+      ]
+    },
+    {
+      "name": "addpoints",
+      "description": "Admin: add points to a user.",
+      "required_role_any": [
+        {
+          "name": "Owner",
+          "discord_role_id": "",
+          "permissions": [
+            "*"
+          ],
+          "point_multiplier": 5.0,
+          "enabled": true
+        },
+        {
+          "name": "Admin",
+          "discord_role_id": "",
+          "permissions": [
+            "shop.manage",
+            "users.manage",
+            "points.give"
+          ],
+          "point_multiplier": 3.0,
+          "enabled": true
+        },
+        {
+          "name": "Moderator",
+          "discord_role_id": "",
+          "permissions": [
+            "shop.view",
+            "users.view"
+          ],
+          "point_multiplier": 2.0,
+          "enabled": true
+        }
+      ],
+      "options_schema": [
+        {
+          "name": "user",
+          "type": "user",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": false,
+          "default": "Manual adjustment"
+        }
+      ],
+      "actions": [
+        {
+          "action": "economy.add",
+          "to_player_from": "args.user",
+          "amount_from": "args.amount",
+          "reason_from": "args.reason"
+        },
+        {
+          "action": "discord.reply_embed",
+          "title": "\ud83d\udcb0 Points Granted",
+          "description": "Gave {{args.amount}} to {{args.user}} (reason: {{args.reason}})"
+        }
+      ]
+    },
+    {
+      "name": "removepoints",
+      "description": "Admin: remove points from a user.",
+      "required_role_any": [
+        {
+          "name": "Owner",
+          "discord_role_id": "",
+          "permissions": [
+            "*"
+          ],
+          "point_multiplier": 5.0,
+          "enabled": true
+        },
+        {
+          "name": "Admin",
+          "discord_role_id": "",
+          "permissions": [
+            "shop.manage",
+            "users.manage",
+            "points.give"
+          ],
+          "point_multiplier": 3.0,
+          "enabled": true
+        },
+        {
+          "name": "Moderator",
+          "discord_role_id": "",
+          "permissions": [
+            "shop.view",
+            "users.view"
+          ],
+          "point_multiplier": 2.0,
+          "enabled": true
+        }
+      ],
+      "options_schema": [
+        {
+          "name": "user",
+          "type": "user",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": false,
+          "default": "Manual adjustment"
+        }
+      ],
+      "actions": [
+        {
+          "action": "economy.remove",
+          "from_player_from": "args.user",
+          "amount_from": "args.amount",
+          "reason_from": "args.reason"
+        },
+        {
+          "action": "discord.reply_embed",
+          "title": "\ud83e\uddfe Points Removed",
+          "description": "Removed {{args.amount}} from {{args.user}} (reason: {{args.reason}})"
+        }
+      ]
+    }
+  ]
+}
