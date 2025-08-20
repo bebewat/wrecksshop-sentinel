@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: wrecks-json-bot-runner
+    env: node
+    plan: starter           # free/auto-sleep or pick your paid plan
+    rootDir: wrecks-json-bot-runner  # remove if your project is at repo root
+    buildCommand: |
+      if [ -f package-lock.json ]; then npm ci; else npm install; fi
+    startCommand: mkdir -p /data && node src/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: API_TOKEN
+        generateValue: true
+      - key: DATA_DIR
+        value: /data
+      # Uncomment if using a secret file or disk path:
+      # - key: BOT_JSON_PATH
+      #   value: /etc/secrets/bot.json
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
